@@ -29,13 +29,13 @@ async function fetchStats() {
 async function renderCards() {
   const grid = document.getElementById('tools-grid');
   const empty = document.getElementById('empty-state');
-  const { tools, count } = await fetchTools();
+  const { tools, total } = await fetchTools();
 
   state.tools = tools;
-  document.getElementById('showing-count').textContent = count;
+  document.getElementById('showing-count').textContent = total;
   grid.querySelectorAll('.tool-card').forEach(c => c.remove());
 
-  if (!count) {
+  if (!total) {
     empty.style.display = 'block';
     return;
   }
@@ -66,7 +66,8 @@ async function renderCards() {
 
     el.querySelector('.card-launch').addEventListener('click', e => {
       e.stopPropagation();
-      window.open(t.online_url, '_blank', 'noopener');
+      if (t.hosted_url) openIframe(t);
+      else window.open(t.online_url, '_blank', 'noopener');
     });
     el.addEventListener('click', () => openModal(t));
     grid.appendChild(el);
@@ -78,7 +79,16 @@ function openModal(t) {
   document.getElementById('m-icon').textContent = t.icon;
   document.getElementById('m-name').textContent = t.name;
   document.getElementById('m-sub').textContent  = `Kills ${t.kills} · Generated in ${t.gen_time} · Saves ${t.saving}`;
-  document.getElementById('m-launch').href  = t.online_url;
+  const launchBtn = document.getElementById('m-launch');
+  if (t.hosted_url) {
+    launchBtn.href = '#';
+    launchBtn.onclick = (e) => { e.preventDefault(); closeModal(); openIframe(t); };
+    launchBtn.textContent = 'Launch on killallsaas →';
+  } else {
+    launchBtn.href = t.online_url;
+    launchBtn.onclick = null;
+    launchBtn.textContent = 'Launch free →';
+  }
   document.getElementById('m-github').href  = t.github_url;
 
   document.getElementById('m-stats').innerHTML = `
@@ -110,6 +120,23 @@ function closeModal() {
 
 function maybeClose(e) {
   if (e.target === document.getElementById('modal')) closeModal();
+}
+
+// ─── IFRAME MODAL ─────────────────────────────────────────────────────────────
+function openIframe(t) {
+  document.getElementById('iframe-icon').textContent    = t.icon;
+  document.getElementById('iframe-name').textContent    = t.name;
+  document.getElementById('iframe-github').href         = t.github_url || '#';
+  document.getElementById('iframe-external').href       = t.hosted_url;
+  document.getElementById('iframe-embed').src           = t.hosted_url;
+  document.getElementById('iframe-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeIframe() {
+  document.getElementById('iframe-modal').classList.remove('open');
+  document.getElementById('iframe-embed').src = ''; // stop loading
+  document.body.style.overflow = '';
 }
 
 // ─── SUBMIT MODAL ─────────────────────────────────────────────────────────────
@@ -214,7 +241,7 @@ document.getElementById('search').addEventListener('input', e => {
 
 // ─── KEYBOARD ─────────────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeSubmitModal(); }
+  if (e.key === 'Escape') { closeModal(); closeSubmitModal(); closeIframe(); }
   if (e.key === '/' && document.activeElement !== document.getElementById('search')) {
     e.preventDefault();
     document.getElementById('search').focus();
@@ -229,7 +256,7 @@ ticker.innerHTML += ticker.innerHTML;
 async function loadStats() {
   const stats = await fetchStats();
   const el = document.getElementById('stat-savings');
-  if (el) el.textContent = '$' + stats.total_savings_mo.toLocaleString() + '/mo';
+  if (el) el.textContent = '$' + Math.round(stats.total_savings_yearly / 12).toLocaleString() + '/mo';
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────

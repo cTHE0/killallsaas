@@ -42,7 +42,7 @@ def save_data(data):
 
 # ─── DEFAULT TOOLS ───────────────────────────────────────────
 DEFAULT_TOOLS = [
-    {"id":"pixelforge","name":"PixelForge","icon":"🎨","cat":"design","kills":"Adobe Photoshop","saving":"$55/mo","saving_yearly":660,"desc":"Full browser-based image editor. Layers, masks, filters, RAW support. Works like Photoshop — no install, no subscription.","features":["Layers & blend modes","Non-destructive filters","RAW support","Brush & selection tools","Color grading","Export PNG/JPG/WebP","Masks & clipping","Plugin support"],"tags":["online","design"],"users":"14.2k","stars":"9.1k","gen_time":"54s","deploy":"# Open right now\nhttps://photopea.com\n\n# Self-host\ndocker run -p 3000:3000 nicedoc/photopea","online_url":"https://photopea.com","github_url":"https://github.com/nicktindall/cyclon.p2p","is_new":False,"kills_count":1247,"created_at":"2024-01-15","active":True},
+    {"id":"pixelforge","name":"Open Photo Editor","icon":"🎨","cat":"design","kills":"Adobe Photoshop","saving":"$55/mo","saving_yearly":660,"desc":"Full browser-based photo editor built with open source tech. Layers, filters, color grading, export — all in the browser. No install, no subscription, no account.","features":["Layers & blend modes","Filters & effects","Color grading","Crop & transform","Brush tools","Export PNG/JPG/WebP","Undo history","Keyboard shortcuts"],"tags":["online","design"],"users":"—","stars":"—","gen_time":"—","deploy":"# Clone and run locally\ngit clone https://github.com/CTHE0/Open-Photo-Editor.git\ncd Open-Photo-Editor\n# Open index.html in your browser","online_url":"https://cthe0.github.io/Open-Photo-Editor/","hosted_url":"https://cthe0.github.io/Open-Photo-Editor/","github_url":"https://github.com/CTHE0/Open-Photo-Editor","is_new":True,"kills_count":0,"created_at":"2025-03-18","active":True},
     {"id":"designforge","name":"DesignForge","icon":"✏️","cat":"design","kills":"Figma","saving":"$45/editor/mo","saving_yearly":540,"desc":"Collaborative vector design tool. Real-time multiplayer, components, auto-layout, prototyping — all in the browser.","features":["Real-time collaboration","Vector editing","Components & variants","Auto-layout","Prototyping & flows","Asset export","Dark mode","REST API"],"tags":["online","selfhost"],"users":"19.8k","stars":"15.3k","gen_time":"63s","deploy":"# Launch online\nhttps://penpot.app\n\n# Self-host\ndocker run -p 3449:3449 penpotapp/frontend","online_url":"https://penpot.app","github_url":"https://github.com/penpot/penpot","is_new":True,"kills_count":2891,"created_at":"2024-03-01","active":True},
     {"id":"drawpad","name":"DrawPad","icon":"🖊️","cat":"design","kills":"Miro / FigJam","saving":"$16/mo","saving_yearly":192,"desc":"Infinite collaborative whiteboard. Sticky notes, shapes, diagrams, real-time cursors.","features":["Infinite canvas","Real-time cursors","Sticky notes","Diagrams & shapes","Image embed","Export SVG/PNG","Guest access","Keyboard shortcuts"],"tags":["online","selfhost"],"users":"11.4k","stars":"8.7k","gen_time":"38s","deploy":"# Online now\nhttps://excalidraw.com\n\n# Self-host\ndocker run -p 80:80 excalidraw/excalidraw","online_url":"https://excalidraw.com","github_url":"https://github.com/excalidraw/excalidraw","is_new":False,"kills_count":743,"created_at":"2024-01-20","active":True},
     {"id":"opennote","name":"OpenNote","icon":"📝","cat":"productivity","kills":"Notion","saving":"$16/user/mo","saving_yearly":192,"desc":"All-in-one workspace. Notes, databases, kanban, wikis, docs. Full Notion replacement.","features":["Rich text editor","Databases & views","Kanban boards","Team wiki","Page sharing","Import from Notion","Mobile apps","API access"],"tags":["online","selfhost"],"users":"34.6k","stars":"24.2k","gen_time":"48s","deploy":"# Hosted free\nhttps://appflowy.io\n\n# Self-host\ndocker run -p 8080:8080 appflowyinc/appflowy-cloud","online_url":"https://appflowy.io","github_url":"https://github.com/AppFlowy-IO/AppFlowy","is_new":False,"kills_count":4821,"created_at":"2024-01-01","active":True},
@@ -232,6 +232,7 @@ def admin_add_tool():
             "gen_time":      f.get("gen_time","—"),
             "deploy":        f.get("deploy","").strip(),
             "online_url":    f.get("online_url","").strip(),
+            "hosted_url":    f.get("hosted_url","").strip(),
             "github_url":    f.get("github_url","").strip(),
             "is_new":        f.get("is_new") == "on",
             "kills_count":   int(f.get("kills_count", 0) or 0),
@@ -272,8 +273,9 @@ def admin_edit_tool(tool_id):
             "stars":         f.get("stars", tool["stars"]).strip(),
             "gen_time":      f.get("gen_time", tool["gen_time"]),
             "deploy":        f.get("deploy", tool["deploy"]).strip(),
-            "online_url":    f.get("online_url", tool["online_url"]).strip(),
-            "github_url":    f.get("github_url", tool["github_url"]).strip(),
+            "online_url":    f.get("online_url", tool.get("online_url","")).strip(),
+            "hosted_url":    f.get("hosted_url", tool.get("hosted_url","")).strip(),
+            "github_url":    f.get("github_url", tool.get("github_url","")).strip(),
             "is_new":        f.get("is_new") == "on",
             "kills_count":   int(f.get("kills_count", tool["kills_count"]) or 0),
         })

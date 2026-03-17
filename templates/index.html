@@ -119,6 +119,25 @@
 </div>
 
 <!-- SUBMIT MODAL -->
+<!-- IFRAME MODAL: hosted tools -->
+<div class="modal-overlay" id="iframe-modal">
+  <div class="iframe-wrapper">
+    <div class="iframe-topbar">
+      <div class="iframe-tool-info">
+        <span id="iframe-icon"></span>
+        <span id="iframe-name"></span>
+        <span class="iframe-badge">hosted on killallsaas.com</span>
+      </div>
+      <div class="iframe-actions">
+        <a href="#" id="iframe-github" class="iframe-btn" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="#" id="iframe-external" class="iframe-btn" target="_blank" rel="noopener">Open in new tab ↗</a>
+        <button class="iframe-close" onclick="closeIframe()">✕ Close</button>
+      </div>
+    </div>
+    <iframe id="iframe-embed" src="" allowfullscreen></iframe>
+  </div>
+</div>
+
 <div class="modal-overlay" id="submit-modal" onclick="maybeCloseSubmit(event)">
   <div class="modal submit-modal-inner">
     <div class="modal-header">

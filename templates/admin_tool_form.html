@@ -107,8 +107,14 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
         <div class="section-label">URLs</div>
 
         <div class="form-group full">
-          <label>Online URL <small>(where users launch the tool)</small></label>
-          <input type="url" name="online_url" placeholder="https://photopea.com" value="{{ tool.online_url if tool else '' }}" required />
+          <label>Online URL <small>(link shown to users — external site)</small></label>
+          <input type="url" name="online_url" placeholder="https://photopea.com" value="{{ tool.online_url if tool else '' }}" />
+        </div>
+
+        <div class="form-group full">
+          <label>Hosted URL <small>(if set, tool opens in an iframe directly on killallsaas.com)</small></label>
+          <input type="url" name="hosted_url" placeholder="https://cthe0.github.io/Open-Photo-Editor/" value="{{ tool.hosted_url if tool else '' }}" />
+          <div style="font-size:0.62rem;color:#555;margin-top:0.3rem;font-family:var(--font-mono);">Leave empty to redirect to external site. Set this for tools you host yourself (GitHub Pages, your own server, etc.)</div>
         </div>
 
         <div class="form-group full">
