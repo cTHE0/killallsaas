@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>killallsaas.com — Free alternatives to every SaaS</title>
+<meta name="description" content="AI-generated open source alternatives to every paid SaaS tool. Free. Self-hostable. Yours forever.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="/" class="logo">kill<em>all</em>saas</a>
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input id="search" type="text" placeholder="Search any tool, or type a SaaS to kill..." autocomplete="off" />
+  </div>
+  <div class="header-right">
+    <div class="kills-badge"><strong id="kill-count">—</strong> killed</div>
+    <button class="btn-submit" id="btn-kill-request">+ Kill a SaaS</button>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner" id="ticker-inner">
+    <span class="ticker-item">🪦 <span class="k">Photoshop</span> → PixelForge — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Figma</span> → DesignForge — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Notion</span> → OpenNote — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Slack</span> → FreeChat — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">HubSpot</span> → OpenCRM — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Calendly</span> → BookItFree — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Zapier</span> → AutoFlow — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Airtable</span> → GridBase — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Hotjar</span> → HeatMapper — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">DocuSign</span> → SignFree — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Photoshop</span> → PixelForge — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Figma</span> → DesignForge — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Notion</span> → OpenNote — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Slack</span> → FreeChat — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">HubSpot</span> → OpenCRM — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Calendly</span> → BookItFree — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Zapier</span> → AutoFlow — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Airtable</span> → GridBase — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">Hotjar</span> → HeatMapper — <span class="f">FREE</span></span>
+    <span class="ticker-item">🪦 <span class="k">DocuSign</span> → SignFree — <span class="f">FREE</span></span>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Categories</div>
+      <button class="cat-btn active" data-cat="all">All tools <span class="cat-count" id="cnt-all">—</span></button>
+      <button class="cat-btn" data-cat="design">Design <span class="cat-count" id="cnt-design">—</span></button>
+      <button class="cat-btn" data-cat="productivity">Productivity <span class="cat-count" id="cnt-productivity">—</span></button>
+      <button class="cat-btn" data-cat="crm">CRM &amp; Marketing <span class="cat-count" id="cnt-crm">—</span></button>
+      <button class="cat-btn" data-cat="devtools">Dev Tools <span class="cat-count" id="cnt-devtools">—</span></button>
+      <button class="cat-btn" data-cat="communication">Communication <span class="cat-count" id="cnt-communication">—</span></button>
+      <button class="cat-btn" data-cat="automation">Automation <span class="cat-count" id="cnt-automation">—</span></button>
+      <button class="cat-btn" data-cat="analytics">Analytics <span class="cat-count" id="cnt-analytics">—</span></button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Filter</div>
+      <button class="cat-btn" data-filter="online">✦ Use online now</button>
+      <button class="cat-btn" data-filter="selfhost">⬡ Self-hostable</button>
+      <button class="cat-btn" data-filter="new">★ Just killed</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Total savings</div>
+      <div class="savings-display">
+        <div class="savings-val" id="total-savings">—</div>
+        <div class="savings-label">saved / year by community</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+    <div class="sort-bar">
+      <div class="result-count"><strong id="showing-count">—</strong> tools killed &amp; free</div>
+      <div class="sort-pills">
+        <button class="pill active" data-sort="popular">Popular</button>
+        <button class="pill" data-sort="newest">Newest</button>
+        <button class="pill" data-sort="savings">Most savings</button>
+      </div>
+    </div>
+
+    <div id="tools-grid">
+      <!-- Loading skeleton -->
+      <div class="skeleton-grid" id="skeleton">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+
+    <div id="empty-state" style="display:none;">
+      <div class="empty-icon">🔍</div>
+      <p>No match found.</p>
+      <button class="btn-request-inline" id="btn-request-from-empty">Request this kill →</button>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Tool detail -->
+<div class="modal-overlay" id="modal" role="dialog" aria-modal="true">
+  <div class="modal" id="modal-inner">
+    <div class="modal-header">
+      <div class="modal-icon" id="m-icon"></div>
+      <div class="modal-title-wrap">
+        <div class="modal-name" id="m-name"></div>
+        <div class="modal-sub" id="m-sub"></div>
+      </div>
+      <div class="modal-actions">
+        <a href="#" id="m-launch" class="btn-launch-big" target="_blank" rel="noopener">Launch free →</a>
+        <a href="#" id="m-github" class="btn-github" target="_blank" rel="noopener">GitHub ↗</a>
+        <button class="btn-close" id="btn-modal-close" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-stats" id="m-stats"></div>
+      <div class="modal-section-title">About</div>
+      <div class="modal-desc" id="m-desc"></div>
+      <div class="modal-section-title">Features included</div>
+      <div class="features-grid" id="m-features"></div>
+      <div class="modal-section-title">Self-host in one command</div>
+      <div class="deploy-block" id="m-deploy"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Kill request -->
+<div class="modal-overlay" id="modal-request" role="dialog" aria-modal="true">
+  <div class="modal modal-sm" id="modal-request-inner">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-name">Kill a SaaS 🔪</div>
+        <div class="modal-sub">Request an AI-generated open source replacement</div>
+      </div>
+      <button class="btn-close" id="btn-request-close" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Which SaaS should we kill?</label>
+        <input type="text" id="req-saas" class="form-input" placeholder="e.g. HubSpot, Adobe Premiere, Salesforce..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your email (optional — get notified when it's live)</label>
+        <input type="email" id="req-email" class="form-input" placeholder="you@company.com" />
+      </div>
+      <div id="req-error" class="form-error" style="display:none;"></div>
+      <div id="req-success" class="form-success" style="display:none;"></div>
+      <button class="btn-kill-submit" id="btn-submit-request">Add to kill queue →</button>
+
+      <div class="kill-queue-preview" id="kill-queue-preview">
+        <div class="sidebar-title" style="margin-top:1.5rem;">Kill queue</div>
+        <div id="queue-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
