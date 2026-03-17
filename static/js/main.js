@@ -131,30 +131,45 @@ function maybeCloseSubmit(e) {
 }
 
 async function submitKill() {
-  const name  = document.getElementById('submit-name').value.trim();
-  const email = document.getElementById('submit-email').value.trim();
-  const msg   = document.getElementById('submit-msg');
+  const name       = document.getElementById('submit-name').value.trim();
+  const github_url = document.getElementById('submit-github').value.trim();
+  const online_url = document.getElementById('submit-online').value.trim();
+  const description= document.getElementById('submit-desc').value.trim();
+  const email      = document.getElementById('submit-email').value.trim();
+  const msg        = document.getElementById('submit-msg');
+
+  msg.className = 'submit-msg';
+  msg.textContent = '';
 
   if (!name) {
-    msg.textContent = 'Please enter a SaaS name.';
+    msg.textContent = 'Please enter the SaaS name to replace.';
+    msg.className = 'submit-msg err';
+    return;
+  }
+  if (!github_url) {
+    msg.textContent = 'Please enter the GitHub repository URL.';
     msg.className = 'submit-msg err';
     return;
   }
 
+  msg.textContent = 'Submitting…';
+  msg.className = 'submit-msg';
+
   const res  = await fetch('/api/submit', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email }),
+    body: JSON.stringify({ name, github_url, online_url, description, email }),
   });
   const data = await res.json();
 
   if (data.ok) {
-    msg.textContent = `🔪 "${name}" added to the kill queue. We'll notify you when it's live.`;
+    msg.innerHTML = `🔪 <strong>"${name}"</strong> submitted! We'll review it and publish it on the marketplace.${email ? " We'll notify you at " + email + " when it's live." : ''}`;
     msg.className = 'submit-msg ok';
-    document.getElementById('submit-name').value  = '';
-    document.getElementById('submit-email').value = '';
+    // reset form
+    ['submit-name','submit-github','submit-online','submit-desc','submit-email']
+      .forEach(id => { document.getElementById(id).value = ''; });
   } else {
-    msg.textContent = data.error || 'Something went wrong.';
+    msg.textContent = data.error || 'Something went wrong. Please try again.';
     msg.className = 'submit-msg err';
   }
 }

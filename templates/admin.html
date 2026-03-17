@@ -202,7 +202,10 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     <table>
       <thead>
         <tr>
-          <th>SaaS name</th>
+          <th>SaaS to kill</th>
+          <th>GitHub</th>
+          <th>Online URL</th>
+          <th>Description</th>
           <th>Email</th>
           <th>Votes</th>
           <th>Status</th>
@@ -213,7 +216,24 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       <tbody>
         {% for req in requests %}
         <tr>
-          <td style="color:var(--white);font-weight:500;">{{ req.saas_name }}</td>
+          <td style="color:var(--white);font-weight:500;white-space:nowrap;">{{ req.saas_name }}</td>
+          <td>
+            {% if req.github_url %}
+              <a href="{{ req.github_url }}" target="_blank" class="url-link" style="color:var(--green)">↗ GitHub</a>
+            {% else %}
+              <span style="color:var(--muted)">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if req.online_url %}
+              <a href="{{ req.online_url }}" target="_blank" class="url-link">↗ Demo</a>
+            {% else %}
+              <span style="color:var(--muted)">—</span>
+            {% endif %}
+          </td>
+          <td style="font-size:0.72rem;color:var(--muted2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ req.description or '' }}">
+            {{ req.description or '—' }}
+          </td>
           <td style="font-family:'DM Mono',monospace;font-size:0.68rem;">{{ req.email or '—' }}</td>
           <td><span class="votes-badge">▲ {{ req.votes }}</span></td>
           <td>

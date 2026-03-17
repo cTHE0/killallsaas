@@ -125,24 +125,28 @@ def api_stats():
     })
 
 
+@app.route("/api/submit", methods=["POST"])
 @app.route("/api/kill-request", methods=["POST"])
 def api_kill_request():
     data = load_data()
     body = request.get_json(silent=True) or {}
-    name = (body.get("saas_name") or "").strip()
+    name = (body.get("name") or body.get("saas_name") or "").strip()
     if not name:
-        return jsonify({"error": "saas_name required"}), 400
+        return jsonify({"ok": False, "error": "Please enter the SaaS name."}), 400
     entry = {
-        "id":         str(uuid.uuid4())[:8],
-        "saas_name":  name,
-        "email":      body.get("email", ""),
-        "status":     "queued",
-        "created_at": datetime.utcnow().isoformat(),
-        "votes":      1,
+        "id":          str(uuid.uuid4())[:8],
+        "saas_name":   name,
+        "email":       (body.get("email") or "").strip(),
+        "github_url":  (body.get("github_url") or "").strip(),
+        "online_url":  (body.get("online_url") or "").strip(),
+        "description": (body.get("description") or "").strip(),
+        "status":      "queued",
+        "created_at":  datetime.utcnow().isoformat(),
+        "votes":       1,
     }
     data["kill_requests"].append(entry)
     save_data(data)
-    return jsonify({"success": True, "message": f"'{name}' added to kill queue.",
+    return jsonify({"ok": True, "message": f"'{name}' added to kill queue.",
                     "request": entry, "queue_position": len(data["kill_requests"])}), 201
 
 

@@ -125,24 +125,52 @@
       <div class="modal-icon">🔪</div>
       <div class="modal-title-wrap">
         <div class="modal-name">Kill a SaaS</div>
-        <div class="modal-sub">Request a free open source alternative</div>
+        <div class="modal-sub">Submit your open source alternative — we'll publish it on the marketplace</div>
       </div>
       <button class="btn-close" onclick="closeSubmitModal()">✕</button>
     </div>
     <div class="modal-body">
+
       <div class="submit-field">
-        <label>Which SaaS should we kill?</label>
-        <input type="text" id="submit-name" placeholder="e.g. HubSpot, Adobe Premiere, Salesforce…"/>
+        <label>Which SaaS does it replace? <span class="req">*</span></label>
+        <input type="text" id="submit-name" placeholder="e.g. Notion, Figma, HubSpot, Adobe Photoshop…"/>
       </div>
+
       <div class="submit-field">
-        <label>Your email <span class="optional">(optional — we'll notify you)</span></label>
+        <label>GitHub repository URL <span class="req">*</span></label>
+        <input type="url" id="submit-github" placeholder="https://github.com/your-username/your-project"/>
+        <div class="field-hint">Your project must be open source and publicly accessible</div>
+      </div>
+
+      <div class="submit-field">
+        <label>Online demo URL <span class="optional">(optional)</span></label>
+        <input type="url" id="submit-online" placeholder="https://your-demo.com — where users can try it instantly"/>
+      </div>
+
+      <div class="submit-field">
+        <label>Short description <span class="optional">(optional)</span></label>
+        <textarea id="submit-desc" rows="3" placeholder="What does it do? What features does it replace?"></textarea>
+      </div>
+
+      <div class="submit-field">
+        <label>Your email <span class="optional">(optional — we'll notify you when it's published)</span></label>
         <input type="email" id="submit-email" placeholder="you@company.com"/>
       </div>
-      <button class="btn-kill-submit" onclick="submitKill()">Add to kill queue →</button>
+
+      <button class="btn-kill-submit" onclick="submitKill()">Submit to kill queue →</button>
       <div id="submit-msg" class="submit-msg"></div>
+
+      <div class="submit-note">
+        Every submission is reviewed before being published. We check that the project is genuinely open source and usable.
+      </div>
     </div>
   </div>
 </div>
+
+<footer>
+  <span>killallsaas.com — every subscription will be killed</span>
+  <a href="/admin" class="admin-link">⚙</a>
+</footer>
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
