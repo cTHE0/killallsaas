@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ action }} Tool — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0c0c;--bg2:#141414;--bg3:#1c1c1c;--border:#252525;--border2:#333;--red:#ff2a2a;--white:#f2ede4;--muted:#555;--muted2:#888;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--border2);}
+
+.admin-header{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:52px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.04em;}
+.logo em{color:var(--red);font-style:normal;}
+.btn{font-family:'DM Mono',monospace;font-size:0.65rem;border-radius:4px;padding:0.35rem 0.8rem;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:all 0.15s;border:1px solid var(--border2);color:var(--muted2);background:none;}
+.btn:hover{border-color:var(--white);color:var(--white);}
+
+.page{max-width:800px;margin:2rem auto;padding:0 1.5rem 3rem;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.03em;margin-bottom:1.5rem;}
+.page-title em{color:var(--red);font-style:normal;}
+
+.form-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.5rem;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-group{margin-bottom:0;}
+.form-group.full{grid-column:1/-1;}
+label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted2);display:block;margin-bottom:0.4rem;}
+label small{font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;}
+input[type=text], input[type=url], input[type=number], select, textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--white);font-family:'DM Mono',monospace;font-size:0.75rem;padding:0.6rem 0.8rem;outline:none;transition:border-color 0.15s;}
+input:focus, select:focus, textarea:focus{border-color:var(--red);}
+input::placeholder, textarea::placeholder{color:var(--muted);}
+select option{background:var(--bg3);}
+textarea{resize:vertical;min-height:80px;line-height:1.6;}
+.checkbox-row{display:flex;align-items:center;gap:0.6rem;margin-top:0.2rem;}
+.checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--red);cursor:pointer;}
+.checkbox-row label{margin:0;font-size:0.72rem;color:var(--muted2);text-transform:none;letter-spacing:0;}
+.divider{height:1px;background:var(--border);margin:1.2rem 0;grid-column:1/-1;}
+.section-label{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.05em;color:var(--muted2);grid-column:1/-1;margin-top:0.3rem;}
+.form-actions{display:flex;gap:0.8rem;margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid var(--border);}
+.btn-save{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:0.08em;background:var(--red);color:#000;border:none;border-radius:5px;padding:0.65rem 2rem;cursor:pointer;transition:background 0.15s;}
+.btn-save:hover{background:#ff4444;}
+.btn-cancel{font-family:'DM Mono',monospace;font-size:0.68rem;background:none;border:1px solid var(--border2);color:var(--muted2);border-radius:5px;padding:0.65rem 1.2rem;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:all 0.15s;}
+.btn-cancel:hover{border-color:var(--white);color:var(--white);}
+.hint{font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-family:'DM Mono',monospace;}
+</style>
+</head>
+<body>
+
+<div class="admin-header">
+  <span class="logo">kill<em>all</em>saas</span>
+  <a href="/admin" class="btn">← Dashboard</a>
+</div>
+
+<div class="page">
+  <div class="page-title">{{ action }} <em>tool</em></div>
+
+  <div class="form-card">
+    <form method="POST">
+      <div class="form-grid">
+
+        <div class="section-label">Basic info</div>
+
+        {% if not tool %}
+        <div class="form-group">
+          <label>ID <small>(slug, no spaces)</small></label>
+          <input type="text" name="id" placeholder="e.g. pixelforge" value="{{ tool.id if tool else '' }}" />
+          <div class="hint">Leave blank to auto-generate</div>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label>Tool name</label>
+          <input type="text" name="name" placeholder="PixelForge" value="{{ tool.name if tool else '' }}" required />
+        </div>
+
+        <div class="form-group">
+          <label>Icon <small>(emoji)</small></label>
+          <input type="text" name="icon" placeholder="🎨" value="{{ tool.icon if tool else '🔧' }}" />
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select name="cat">
+            {% for c in cats %}
+            <option value="{{ c }}" {% if tool and tool.cat == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Kills (SaaS name)</label>
+          <input type="text" name="kills" placeholder="Adobe Photoshop" value="{{ tool.kills if tool else '' }}" required />
+        </div>
+
+        <div class="form-group">
+          <label>Saving label</label>
+          <input type="text" name="saving" placeholder="$55/mo" value="{{ tool.saving if tool else '' }}" />
+        </div>
+
+        <div class="form-group">
+          <label>Saving / year <small>(number only, for sorting)</small></label>
+          <input type="number" name="saving_yearly" placeholder="660" value="{{ tool.saving_yearly if tool else '0' }}" min="0" />
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-label">URLs</div>
+
+        <div class="form-group full">
+          <label>Online URL <small>(where users launch the tool)</small></label>
+          <input type="url" name="online_url" placeholder="https://photopea.com" value="{{ tool.online_url if tool else '' }}" required />
+        </div>
+
+        <div class="form-group full">
+          <label>GitHub URL</label>
+          <input type="url" name="github_url" placeholder="https://github.com/..." value="{{ tool.github_url if tool else '' }}" />
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-label">Content</div>
+
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea name="desc" placeholder="Short description of the tool..." rows="3">{{ tool.desc if tool else '' }}</textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>Features <small>(one per line)</small></label>
+          <textarea name="features" placeholder="Layers & blend modes&#10;Non-destructive filters&#10;RAW support" rows="5">{{ tool.features|join('\n') if tool else '' }}</textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>Deploy / self-host commands</label>
+          <textarea name="deploy" placeholder="# Self-host&#10;docker run -p 3000:3000 ..." rows="5" style="font-family:'DM Mono',monospace;">{{ tool.deploy if tool else '' }}</textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>Tags <small>(comma separated: online, selfhost, design)</small></label>
+          <input type="text" name="tags" placeholder="online, selfhost" value="{{ tool.tags|join(', ') if tool else 'online' }}" />
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-label">Stats</div>
+
+        <div class="form-group">
+          <label>Active users</label>
+          <input type="text" name="users" placeholder="14.2k" value="{{ tool.users if tool else '0' }}" />
+        </div>
+
+        <div class="form-group">
+          <label>GitHub stars</label>
+          <input type="text" name="stars" placeholder="9.1k" value="{{ tool.stars if tool else '0' }}" />
+        </div>
+
+        <div class="form-group">
+          <label>AI gen time</label>
+          <input type="text" name="gen_time" placeholder="54s" value="{{ tool.gen_time if tool else '—' }}" />
+        </div>
+
+        <div class="form-group">
+          <label>Kill count <small>(times used)</small></label>
+          <input type="number" name="kills_count" placeholder="1247" value="{{ tool.kills_count if tool else '0' }}" min="0" />
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-row">
+            <input type="checkbox" name="is_new" id="is_new" {% if tool and tool.is_new %}checked{% endif %} />
+            <label for="is_new">Mark as "New" (shows red badge)</label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-save">{{ action }} tool →</button>
+        <a href="/admin" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

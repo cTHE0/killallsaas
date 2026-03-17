@@ -1,25 +1,23 @@
-// ─────────────────────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────────────────────
+// ─── STATE ────────────────────────────────────────────────────────────────────
 const state = {
   cat: 'all',
   sort: 'popular',
   query: '',
   filter: null,
+  tools: [],
 };
 
-// ─────────────────────────────────────────────────────────────
-// API
-// ─────────────────────────────────────────────────────────────
+// ─── API ──────────────────────────────────────────────────────────────────────
 async function fetchTools() {
   const params = new URLSearchParams({
     cat: state.cat,
-    sort: state.sort,
     q: state.query,
+    sort: state.sort,
     tag: state.filter || '',
   });
   const res = await fetch(`/api/tools?${params}`);
-  return res.json();
+  const data = await res.json();
+  return data;
 }
 
 async function fetchStats() {
@@ -27,52 +25,26 @@ async function fetchStats() {
   return res.json();
 }
 
-async function submitKillRequest(saas_name, email) {
-  const res = await fetch('/api/kill-request', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ saas_name, email }),
-  });
-  return res.json();
-}
-
-async function fetchKillQueue() {
-  const res = await fetch('/api/kill-requests');
-  return res.json();
-}
-
-async function voteKillRequest(id) {
-  const res = await fetch(`/api/kill-request/${id}/vote`, { method: 'POST' });
-  return res.json();
-}
-
-// ─────────────────────────────────────────────────────────────
-// RENDER CARDS
-// ─────────────────────────────────────────────────────────────
+// ─── RENDER ───────────────────────────────────────────────────────────────────
 async function renderCards() {
   const grid = document.getElementById('tools-grid');
   const empty = document.getElementById('empty-state');
-  const skeleton = document.getElementById('skeleton');
+  const { tools, count } = await fetchTools();
 
-  if (skeleton) skeleton.style.display = 'contents';
-  empty.style.display = 'none';
+  state.tools = tools;
+  document.getElementById('showing-count').textContent = count;
   grid.querySelectorAll('.tool-card').forEach(c => c.remove());
 
-  const data = await fetchTools();
-  if (skeleton) skeleton.style.display = 'none';
-
-  document.getElementById('showing-count').textContent = data.total;
-
-  if (!data.tools || data.tools.length === 0) {
+  if (!count) {
     empty.style.display = 'block';
     return;
   }
+  empty.style.display = 'none';
 
-  data.tools.forEach((t, i) => {
+  tools.forEach(t => {
     const el = document.createElement('div');
     el.className = 'tool-card';
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(8px)';
+    el.dataset.id = t.id;
     el.innerHTML = `
       <div class="saving-badge">saves ${t.saving}</div>
       <div class="card-top">
@@ -85,76 +57,29 @@ async function renderCards() {
       <div class="card-desc">${t.desc}</div>
       <div class="card-footer">
         <div class="card-tags">
-          ${t.tags.includes('online') ? '<span class="ctag">online</span>' : ''}
+          ${t.tags.includes('online')   ? '<span class="ctag">online</span>' : ''}
           ${t.tags.includes('selfhost') ? '<span class="ctag">self-host</span>' : ''}
-          ${t.is_new ? '<span class="ctag ctag-new">new</span>' : ''}
+          ${t.is_new                    ? '<span class="ctag new-tag">new</span>' : ''}
         </div>
         <button class="card-launch" data-url="${t.online_url}">Launch →</button>
       </div>`;
+
     el.querySelector('.card-launch').addEventListener('click', e => {
       e.stopPropagation();
       window.open(t.online_url, '_blank', 'noopener');
     });
     el.addEventListener('click', () => openModal(t));
     grid.appendChild(el);
-
-    // Staggered fade-in
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        el.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
-        el.style.opacity = '1';
-        el.style.transform = 'translateY(0)';
-      }, i * 25);
-    });
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-// STATS
-// ─────────────────────────────────────────────────────────────
-async function loadStats() {
-  const stats = await fetchStats();
-
-  // Animate kill counter
-  const el = document.getElementById('kill-count');
-  let n = 0;
-  const target = stats.total_kills;
-  const step = () => {
-    n = Math.min(n + Math.ceil(target / 60), target);
-    el.textContent = n.toLocaleString();
-    if (n < target) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-
-  // Category counts
-  const cats = stats.categories;
-  Object.entries(cats).forEach(([cat, count]) => {
-    const el = document.getElementById(`cnt-${cat}`);
-    if (el) el.textContent = count;
-  });
-  const allEl = document.getElementById('cnt-all');
-  if (allEl) allEl.textContent = stats.total_tools;
-
-  // Total savings
-  const savEl = document.getElementById('total-savings');
-  if (savEl) {
-    const yearly = stats.total_savings_yearly;
-    savEl.textContent = yearly >= 1000
-      ? `$${(yearly / 1000).toFixed(0)}k/yr`
-      : `$${yearly}/yr`;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// MODAL: Tool detail
-// ─────────────────────────────────────────────────────────────
+// ─── MODAL ────────────────────────────────────────────────────────────────────
 function openModal(t) {
   document.getElementById('m-icon').textContent = t.icon;
   document.getElementById('m-name').textContent = t.name;
-  document.getElementById('m-sub').textContent =
-    `Kills ${t.kills} · Generated in ${t.gen_time} · Saves ${t.saving}`;
-  document.getElementById('m-launch').href = t.online_url;
-  document.getElementById('m-github').href = t.github_url;
+  document.getElementById('m-sub').textContent  = `Kills ${t.kills} · Generated in ${t.gen_time} · Saves ${t.saving}`;
+  document.getElementById('m-launch').href  = t.online_url;
+  document.getElementById('m-github').href  = t.github_url;
 
   document.getElementById('m-stats').innerHTML = `
     <div class="stat"><div class="stat-val green">${t.users}</div><div class="stat-label">Active users</div></div>
@@ -167,12 +92,12 @@ function openModal(t) {
   document.getElementById('m-features').innerHTML =
     t.features.map(f => `<div class="feature-item">${f}</div>`).join('');
 
-  const lines = t.deploy.split('\n');
-  document.getElementById('m-deploy').innerHTML = lines.map(l =>
-    l.startsWith('#')
-      ? `<span class="deploy-comment">${l}</span>`
-      : `<span>${l}</span>`
-  ).join('\n');
+  document.getElementById('m-deploy').innerHTML =
+    t.deploy.split('\n').map(line =>
+      line.startsWith('#')
+        ? `<span class="deploy-comment">${line}</span>`
+        : `<span>${line}</span>`
+    ).join('\n');
 
   document.getElementById('modal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -183,82 +108,58 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
-// ─────────────────────────────────────────────────────────────
-// MODAL: Kill request
-// ─────────────────────────────────────────────────────────────
-async function openKillRequest() {
-  document.getElementById('req-saas').value = '';
-  document.getElementById('req-email').value = '';
-  document.getElementById('req-error').style.display = 'none';
-  document.getElementById('req-success').style.display = 'none';
-
-  // Load existing queue
-  await renderQueue();
-
-  document.getElementById('modal-request').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  document.getElementById('req-saas').focus();
+function maybeClose(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
 }
 
-function closeKillRequest() {
-  document.getElementById('modal-request').classList.remove('open');
+// ─── SUBMIT MODAL ─────────────────────────────────────────────────────────────
+function openSubmitModal() {
+  document.getElementById('submit-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('submit-msg').textContent = '';
+  document.getElementById('submit-name').value = '';
+  document.getElementById('submit-email').value = '';
+}
+
+function closeSubmitModal() {
+  document.getElementById('submit-modal').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-async function renderQueue() {
-  const data = await fetchKillQueue();
-  const list = document.getElementById('queue-list');
-  if (!data.requests || data.requests.length === 0) {
-    list.innerHTML = '<div style="font-size:0.72rem;color:var(--muted);padding:0.5rem 0;">No requests yet. Be first.</div>';
+function maybeCloseSubmit(e) {
+  if (e.target === document.getElementById('submit-modal')) closeSubmitModal();
+}
+
+async function submitKill() {
+  const name  = document.getElementById('submit-name').value.trim();
+  const email = document.getElementById('submit-email').value.trim();
+  const msg   = document.getElementById('submit-msg');
+
+  if (!name) {
+    msg.textContent = 'Please enter a SaaS name.';
+    msg.className = 'submit-msg err';
     return;
   }
-  list.innerHTML = data.requests.slice(0, 8).map(r => `
-    <div class="queue-item">
-      <span>${r.saas_name}</span>
-      <button class="queue-votes" data-id="${r.id}">▲ ${r.votes}</button>
-    </div>`).join('');
 
-  list.querySelectorAll('.queue-votes').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      await voteKillRequest(btn.dataset.id);
-      await renderQueue();
-    });
+  const res  = await fetch('/api/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email }),
   });
-}
+  const data = await res.json();
 
-async function handleKillSubmit() {
-  const saas = document.getElementById('req-saas').value.trim();
-  const email = document.getElementById('req-email').value.trim();
-  const errEl = document.getElementById('req-error');
-  const okEl = document.getElementById('req-success');
-
-  errEl.style.display = 'none';
-  okEl.style.display = 'none';
-
-  if (!saas) {
-    errEl.textContent = 'Please enter the name of the SaaS to kill.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  const data = await submitKillRequest(saas, email);
-  if (data.error) {
-    errEl.textContent = data.error;
-    errEl.style.display = 'block';
+  if (data.ok) {
+    msg.textContent = `🔪 "${name}" added to the kill queue. We'll notify you when it's live.`;
+    msg.className = 'submit-msg ok';
+    document.getElementById('submit-name').value  = '';
+    document.getElementById('submit-email').value = '';
   } else {
-    okEl.textContent = `🔪 "${saas}" added to kill queue — position #${data.queue_position}`;
-    okEl.style.display = 'block';
-    document.getElementById('req-saas').value = '';
-    document.getElementById('req-email').value = '';
-    await renderQueue();
+    msg.textContent = data.error || 'Something went wrong.';
+    msg.className = 'submit-msg err';
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// EVENT LISTENERS
-// ─────────────────────────────────────────────────────────────
-
-// Category buttons
+// ─── FILTERS & SORT ───────────────────────────────────────────────────────────
 document.querySelectorAll('.cat-btn[data-cat]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.cat-btn[data-cat]').forEach(b => b.classList.remove('active'));
@@ -268,7 +169,6 @@ document.querySelectorAll('.cat-btn[data-cat]').forEach(btn => {
   });
 });
 
-// Filter buttons
 document.querySelectorAll('.cat-btn[data-filter]').forEach(btn => {
   btn.addEventListener('click', () => {
     const same = state.filter === btn.dataset.filter;
@@ -279,7 +179,6 @@ document.querySelectorAll('.cat-btn[data-filter]').forEach(btn => {
   });
 });
 
-// Sort pills
 document.querySelectorAll('.pill').forEach(p => {
   p.addEventListener('click', () => {
     document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
@@ -289,47 +188,35 @@ document.querySelectorAll('.pill').forEach(p => {
   });
 });
 
-// Search (debounced)
-let searchTimeout;
+let searchTimer;
 document.getElementById('search').addEventListener('input', e => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    state.query = e.target.value.trim();
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    state.query = e.target.value;
     renderCards();
-  }, 220);
+  }, 200);
 });
 
-// Tool detail modal
-document.getElementById('btn-modal-close').addEventListener('click', closeModal);
-document.getElementById('modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal')) closeModal();
-});
-
-// Kill request modal
-document.getElementById('btn-kill-request').addEventListener('click', openKillRequest);
-document.getElementById('btn-request-from-empty').addEventListener('click', openKillRequest);
-document.getElementById('btn-request-close').addEventListener('click', closeKillRequest);
-document.getElementById('btn-submit-request').addEventListener('click', handleKillSubmit);
-document.getElementById('modal-request').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal-request')) closeKillRequest();
-});
-document.getElementById('req-saas').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleKillSubmit();
-});
-
-// Escape key
+// ─── KEYBOARD ─────────────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeKillRequest(); }
+  if (e.key === 'Escape') { closeModal(); closeSubmitModal(); }
+  if (e.key === '/' && document.activeElement !== document.getElementById('search')) {
+    e.preventDefault();
+    document.getElementById('search').focus();
+  }
 });
 
-// ─────────────────────────────────────────────────────────────
-// TICKER — duplicate for seamless loop
-// ─────────────────────────────────────────────────────────────
+// ─── TICKER LOOP ──────────────────────────────────────────────────────────────
 const ticker = document.getElementById('ticker-inner');
-if (ticker) ticker.innerHTML += ticker.innerHTML;
+ticker.innerHTML += ticker.innerHTML;
 
-// ─────────────────────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────────────────────
-loadStats();
+// ─── STATS ────────────────────────────────────────────────────────────────────
+async function loadStats() {
+  const stats = await fetchStats();
+  const el = document.getElementById('stat-savings');
+  if (el) el.textContent = '$' + stats.total_savings_mo.toLocaleString() + '/mo';
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
 renderCards();
+loadStats();

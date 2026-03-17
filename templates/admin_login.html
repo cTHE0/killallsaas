@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — killallsaas.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0c0c0c;color:#f2ede4;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.box{background:#141414;border:1px solid #252525;border-radius:8px;padding:2.5rem 2rem;width:100%;max-width:360px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.04em;margin-bottom:0.3rem;}
+.logo em{color:#ff2a2a;font-style:normal;}
+.sub{font-family:'DM Mono',monospace;font-size:0.6rem;color:#555;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:2rem;}
+label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:#666;display:block;margin-bottom:0.4rem;}
+input[type=password]{width:100%;background:#0c0c0c;border:1px solid #333;border-radius:5px;color:#f2ede4;font-family:'DM Mono',monospace;font-size:0.8rem;padding:0.65rem 0.9rem;outline:none;margin-bottom:1rem;transition:border-color 0.15s;}
+input[type=password]:focus{border-color:#ff2a2a;}
+button{width:100%;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.08em;background:#ff2a2a;color:#000;border:none;border-radius:5px;padding:0.7rem;cursor:pointer;transition:background 0.15s;}
+button:hover{background:#ff4444;}
+.error{background:rgba(255,42,42,0.1);border:1px solid rgba(255,42,42,0.3);border-radius:4px;padding:0.6rem 0.8rem;font-size:0.72rem;color:#ff2a2a;margin-bottom:1rem;}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">kill<em>all</em>saas</div>
+  <div class="sub">Admin panel</div>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="POST">
+    <label>Password</label>
+    <input type="password" name="password" placeholder="••••••••" autofocus />
+    <button type="submit">Enter →</button>
+  </form>
+</div>
+</body>
+</html>

@@ -3,71 +3,97 @@
 AI-powered open source marketplace. Kill every paid SaaS with a free alternative.
 
 ## Stack
+
 - **Backend**: Python / Flask
 - **Frontend**: Vanilla JS + CSS (no framework)
-- **Fonts**: Bebas Neue + DM Mono + DM Sans
+- **Storage**: `data.json` (swap with Postgres in production)
 
 ## Project structure
 
 ```
 killallsaas/
-├── app.py                  # Flask app + all API routes
+├── app.py                     # Flask app + all routes
+├── data.json                  # Auto-created on first run (gitignored)
+├── .env                       # Secrets — never commit this file
+├── .env.example               # Template to share with the team
 ├── requirements.txt
 ├── templates/
-│   └── index.html          # Main page (Jinja2 template)
+│   ├── index.html             # Public site
+│   ├── admin_login.html       # Admin login
+│   ├── admin.html             # Admin dashboard
+│   └── admin_tool_form.html   # Add / Edit tool
 └── static/
-    ├── css/
-    │   └── main.css        # All styles
-    └── js/
-        └── main.js         # Frontend logic (fetches from API)
+    ├── css/main.css
+    └── js/main.js
 ```
 
-## API routes
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET | `/` | Main page |
-| GET | `/api/tools` | List tools (filter: `cat`, `sort`, `q`, `tag`) |
-| GET | `/api/tools/<id>` | Single tool detail |
-| GET | `/api/stats` | Global stats |
-| POST | `/api/kill-request` | Submit a SaaS to kill |
-| GET | `/api/kill-requests` | Kill queue |
-| POST | `/api/kill-request/<id>/vote` | Upvote a kill request |
-
-## Quick start
+## Local setup
 
 ```bash
-# 1. Install dependencies
+# 1. Clone
+git clone https://github.com/yourname/killallsaas.git
+cd killallsaas
+
+# 2. Install
 pip install -r requirements.txt
 
-# 2. Run
+# 3. Configure secrets
+cp .env.example .env
+# Edit .env with your own values
+
+# 4. Run
 python app.py
-
-# 3. Open
-open http://localhost:5000
+# → http://localhost:5000
 ```
 
-## Production (Gunicorn)
+## Environment variables
 
-```bash
-pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
+Copy `.env.example` to `.env` and fill in your values. **Never commit `.env`.**
+
+| Variable | Description |
+|----------|-------------|
+| `SECRET_KEY` | Flask session secret — generate with `python -c "import secrets; print(secrets.token_hex(32))"` |
+| `ADMIN_PASSWORD` | Password for the `/admin` panel |
+
+## Admin panel
+
+→ `https://killallsaas.com/admin`
+
+| Route | Description |
+|-------|-------------|
+| `GET /admin` | Dashboard — tools + kill requests |
+| `GET/POST /admin/tools/add` | Add a new tool |
+| `GET/POST /admin/tools/<id>/edit` | Edit a tool |
+| `POST /admin/tools/<id>/toggle` | Show / hide a tool |
+| `POST /admin/tools/<id>/delete` | Delete a tool |
+| `POST /admin/requests/<id>/status` | Mark request done/queued |
+| `GET /admin/export` | Download data.json |
+
+## Public API
+
+| Route | Params | Description |
+|-------|--------|-------------|
+| `GET /api/tools` | `cat`, `sort`, `q`, `tag` | List tools |
+| `GET /api/stats` | — | Global stats |
+| `POST /api/kill-request` | `saas_name`, `email` | Submit a kill request |
+| `GET /api/kill-requests` | — | Kill queue |
+| `POST /api/kill-request/<id>/vote` | — | Upvote |
+
+## Deploy on PythonAnywhere
+
+WSGI file:
+```python
+from app import app as application
 ```
 
-## Deploy to Railway / Render / Fly.io
+Set `SECRET_KEY` and `ADMIN_PASSWORD` under **Web > Environment variables**.
+
+## Deploy on Railway / Render / Fly.io
 
 ```bash
-# Add Procfile
 echo "web: gunicorn app:app" > Procfile
-
-# Push to GitHub and connect to Railway
-# Set PORT env var if needed
+pip install gunicorn
+pip freeze > requirements.txt
 ```
 
-## Next steps
-
-- [ ] Connect to Postgres/Supabase (replace in-memory TOOLS list)
-- [ ] Add AI generation pipeline (Claude API → generate tool on demand)
-- [ ] Add X bot (post tweet on every new kill)
-- [ ] Add user accounts + GitHub OAuth
-- [ ] Add tool rating / review system
+Set env vars in the platform dashboard.

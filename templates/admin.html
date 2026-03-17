@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — killallsaas.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0c0c;--bg2:#141414;--bg3:#1c1c1c;--border:#252525;--border2:#333;--red:#ff2a2a;--green:#22c55e;--amber:#f59e0b;--white:#f2ede4;--muted:#555;--muted2:#888;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;}
+::-webkit-scrollbar{width:3px;height:3px;}::-webkit-scrollbar-thumb{background:var(--border2);}
+
+/* HEADER */
+.admin-header{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:52px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.04em;}
+.logo em{color:var(--red);font-style:normal;}
+.logo small{font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-left:0.5rem;}
+.header-nav{display:flex;align-items:center;gap:0.8rem;}
+.btn{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.05em;border-radius:4px;padding:0.35rem 0.8rem;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;transition:all 0.15s;border:1px solid var(--border2);color:var(--muted2);background:none;}
+.btn:hover{border-color:var(--white);color:var(--white);}
+.btn-red{background:var(--red);border-color:var(--red);color:#000;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:0.08em;}
+.btn-red:hover{background:#ff4444;border-color:#ff4444;color:#000;}
+.btn-green{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.4);color:var(--green);}
+.btn-amber{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.3);color:var(--amber);}
+.btn-danger{background:rgba(255,42,42,0.12);border-color:rgba(255,42,42,0.3);color:var(--red);}
+.btn-sm{padding:0.2rem 0.55rem;font-size:0.6rem;}
+
+/* LAYOUT */
+.admin-body{max-width:1300px;margin:0 auto;padding:1.5rem;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;}
+.stat-card{background:var(--bg2);padding:1rem;text-align:center;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.03em;line-height:1;color:var(--white);}
+.stat-val.red{color:var(--red);}
+.stat-val.green{color:var(--green);}
+.stat-val.amber{color:var(--amber);}
+.stat-label{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+
+/* SECTIONS */
+.section{background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:1.5rem;overflow:hidden;}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1.2rem;border-bottom:1px solid var(--border);}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.05em;}
+.section-title span{color:var(--muted);font-size:0.8rem;margin-left:0.5rem;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;}
+th{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:0.6rem 1rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:0.65rem 1rem;font-size:0.78rem;color:var(--muted2);border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.tool-name{color:var(--white);font-weight:500;display:flex;align-items:center;gap:0.5rem;}
+.tool-icon{font-size:14px;}
+.kills-pill{font-family:'DM Mono',monospace;font-size:0.58rem;background:rgba(255,42,42,0.1);border:1px solid rgba(255,42,42,0.2);color:var(--red);border-radius:3px;padding:1px 6px;white-space:nowrap;}
+.saving-pill{font-family:'DM Mono',monospace;font-size:0.58rem;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:var(--green);border-radius:3px;padding:1px 6px;}
+.cat-pill{font-family:'DM Mono',monospace;font-size:0.55rem;background:var(--bg3);border:1px solid var(--border2);color:var(--muted2);border-radius:3px;padding:1px 6px;}
+.status-active{color:var(--green);}
+.status-inactive{color:var(--muted);}
+.badge-new{font-family:'DM Mono',monospace;font-size:0.5rem;background:rgba(255,42,42,0.15);border:1px solid rgba(255,42,42,0.3);color:var(--red);border-radius:3px;padding:1px 5px;margin-left:4px;}
+
+/* REQUEST STATUS */
+.status-queued{color:var(--amber);}
+.status-done{color:var(--green);}
+.votes-badge{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--red);}
+
+/* ACTIONS CELL */
+.actions{display:flex;gap:0.35rem;flex-wrap:wrap;}
+
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:0.3rem;padding:0.8rem 1.2rem;border-bottom:1px solid var(--border);overflow-x:auto;}
+.tab{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;background:none;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:0.22rem 0.7rem;cursor:pointer;transition:all 0.1s;white-space:nowrap;}
+.tab:hover{border-color:var(--border2);color:var(--muted2);}
+.tab.active{border-color:var(--red);color:var(--red);}
+
+/* SEARCH */
+.table-search{background:var(--bg);border:1px solid var(--border2);border-radius:4px;color:var(--white);font-family:'DM Mono',monospace;font-size:0.7rem;padding:0.35rem 0.7rem;outline:none;width:220px;transition:border-color 0.15s;}
+.table-search:focus{border-color:var(--red);}
+.table-search::placeholder{color:var(--muted);}
+
+/* URL cell */
+.url-link{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted2);text-decoration:none;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;}
+.url-link:hover{color:var(--white);}
+</style>
+</head>
+<body>
+
+<div class="admin-header">
+  <div>
+    <span class="logo">kill<em>all</em>saas</span>
+    <span style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-left:0.5rem;">admin</span>
+  </div>
+  <div class="header-nav">
+    <a href="/" class="btn" target="_blank">↗ View site</a>
+    <a href="/admin/export" class="btn">⬇ Export JSON</a>
+    <a href="/admin/tools/add" class="btn btn-red">+ Add tool</a>
+    <a href="/admin/logout" class="btn">Logout</a>
+  </div>
+</div>
+
+<div class="admin-body">
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val">{{ stats.total }}</div><div class="stat-label">Total tools</div></div>
+    <div class="stat-card"><div class="stat-val green">{{ stats.active }}</div><div class="stat-label">Active</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--muted)">{{ stats.inactive }}</div><div class="stat-label">Hidden</div></div>
+    <div class="stat-card"><div class="stat-val amber">{{ stats.pending }}</div><div class="stat-label">Kill requests</div></div>
+    <div class="stat-card"><div class="stat-val red">{{ stats.done }}</div><div class="stat-label">Requests done</div></div>
+  </div>
+
+  <!-- TOOLS TABLE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Tools <span>{{ tools|length }}</span></div>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <input class="table-search" type="text" placeholder="Search tools..." id="tool-search" />
+        <a href="/admin/tools/add" class="btn btn-red">+ Add tool</a>
+      </div>
+    </div>
+    <div class="filter-tabs">
+      <button class="tab active" data-cat="all">All</button>
+      <button class="tab" data-cat="design">Design</button>
+      <button class="tab" data-cat="productivity">Productivity</button>
+      <button class="tab" data-cat="crm">CRM</button>
+      <button class="tab" data-cat="devtools">Dev Tools</button>
+      <button class="tab" data-cat="communication">Communication</button>
+      <button class="tab" data-cat="automation">Automation</button>
+      <button class="tab" data-cat="analytics">Analytics</button>
+    </div>
+    <table id="tools-table">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>Kills</th>
+          <th>Category</th>
+          <th>Saving / yr</th>
+          <th>Uses</th>
+          <th>Online URL</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tool in tools %}
+        <tr data-cat="{{ tool.cat }}" data-name="{{ tool.name|lower }} {{ tool.kills|lower }}">
+          <td>
+            <div class="tool-name">
+              <span class="tool-icon">{{ tool.icon }}</span>
+              {{ tool.name }}
+              {% if tool.is_new %}<span class="badge-new">new</span>{% endif %}
+            </div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);margin-top:2px;">id: {{ tool.id }}</div>
+          </td>
+          <td><span class="kills-pill">{{ tool.kills }}</span></td>
+          <td><span class="cat-pill">{{ tool.cat }}</span></td>
+          <td>
+            {% if tool.saving_yearly > 0 %}
+              <span class="saving-pill">${{ tool.saving_yearly }}/yr</span>
+            {% else %}
+              <span style="color:var(--muted);font-size:0.7rem;">—</span>
+            {% endif %}
+          </td>
+          <td style="font-family:'DM Mono',monospace;font-size:0.68rem;">{{ tool.kills_count|default(0) }}</td>
+          <td>
+            <a class="url-link" href="{{ tool.online_url }}" target="_blank">{{ tool.online_url }}</a>
+          </td>
+          <td>
+            {% if tool.active %}
+              <span class="status-active">● Active</span>
+            {% else %}
+              <span class="status-inactive">○ Hidden</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="actions">
+              <a href="/admin/tools/{{ tool.id }}/edit" class="btn btn-sm">Edit</a>
+              <form method="POST" action="/admin/tools/{{ tool.id }}/toggle" style="display:inline;">
+                {% if tool.active %}
+                  <button type="submit" class="btn btn-sm btn-amber">Hide</button>
+                {% else %}
+                  <button type="submit" class="btn btn-sm btn-green">Show</button>
+                {% endif %}
+              </form>
+              <form method="POST" action="/admin/tools/{{ tool.id }}/delete" style="display:inline;" onsubmit="return confirm('Delete {{ tool.name }}?')">
+                <button type="submit" class="btn btn-sm btn-danger">Del</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- KILL REQUESTS TABLE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Kill requests <span>{{ requests|length }}</span></div>
+    </div>
+    {% if requests %}
+    <table>
+      <thead>
+        <tr>
+          <th>SaaS name</th>
+          <th>Email</th>
+          <th>Votes</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in requests %}
+        <tr>
+          <td style="color:var(--white);font-weight:500;">{{ req.saas_name }}</td>
+          <td style="font-family:'DM Mono',monospace;font-size:0.68rem;">{{ req.email or '—' }}</td>
+          <td><span class="votes-badge">▲ {{ req.votes }}</span></td>
+          <td>
+            {% if req.status == 'queued' %}
+              <span class="status-queued">● Queued</span>
+            {% elif req.status == 'done' %}
+              <span class="status-done">✓ Done</span>
+            {% else %}
+              <span style="color:var(--muted)">{{ req.status }}</span>
+            {% endif %}
+          </td>
+          <td style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);">{{ req.created_at[:10] }}</td>
+          <td>
+            <div class="actions">
+              {% if req.status == 'queued' %}
+              <form method="POST" action="/admin/requests/{{ req.id }}/status" style="display:inline;">
+                <input type="hidden" name="status" value="done">
+                <button type="submit" class="btn btn-sm btn-green">✓ Mark done</button>
+              </form>
+              {% else %}
+              <form method="POST" action="/admin/requests/{{ req.id }}/status" style="display:inline;">
+                <input type="hidden" name="status" value="queued">
+                <button type="submit" class="btn btn-sm btn-amber">↩ Reopen</button>
+              </form>
+              {% endif %}
+              <form method="POST" action="/admin/requests/{{ req.id }}/delete" style="display:inline;" onsubmit="return confirm('Delete this request?')">
+                <button type="submit" class="btn btn-sm btn-danger">Del</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div style="padding:2rem;text-align:center;font-size:0.78rem;color:var(--muted);">No kill requests yet.</div>
+    {% endif %}
+  </div>
+
+</div>
+
+<script>
+// Filter tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const cat = tab.dataset.cat;
+    document.querySelectorAll('#tools-table tbody tr').forEach(row => {
+      row.style.display = (cat === 'all' || row.dataset.cat === cat) ? '' : 'none';
+    });
+  });
+});
+
+// Search
+document.getElementById('tool-search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('#tools-table tbody tr').forEach(row => {
+    row.style.display = row.dataset.name.includes(q) ? '' : 'none';
+  });
+});
+</script>
+</body>
+</html>
